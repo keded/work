@@ -114,7 +114,7 @@ public class OTKFrame extends JFrame {
 
         buttonReopenFTDI = new JButton("Включить связь ПК с рабочим местом");
         buttonReopenFTDI.setFont(fontButton);
-        otkPanel.add(buttonReopenFTDI, helper.nextRow().get());
+        //otkPanel.add(buttonReopenFTDI, helper.nextRow().get());
         indEnaFTDI = new Indicator(radius,radius);
 
 
