@@ -1,8 +1,6 @@
 package pro.filatov.workstation4ceb;
 
-
-import pro.filatov.workstation4ceb.form.AppFrame;
-import pro.filatov.workstation4ceb.model.Model;
+import pro.filatov.workstation4ceb.view.appViewFrame;
 
 import javax.swing.*;
 
@@ -21,8 +19,8 @@ public class Main {
         SwingUtilities.invokeLater(
                 new Runnable() {
                     public void run() {
-                        Model.init();
-                        AppFrame.getInstance();
+
+                        appViewFrame MainFrame = new appViewFrame();
 
                         //new AppFrame();
                     }
