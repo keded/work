@@ -18,6 +18,9 @@ import java.text.DecimalFormat;
 import java.util.LinkedList;
 
 public class GraphFrame implements GLEventListener{
+
+
+    public JPanel settingsPlotPanel = new JPanel(new GridBagLayout());
     private PointData pointData;
     private double rangeY, textOffsetZero = 0.0d, yMax, yMin, delYRange, textOffset = 0.0d;
     private boolean flagLabelList = true;
@@ -425,6 +428,9 @@ public class GraphFrame implements GLEventListener{
 
 
     public void start(GraphFrame b, PointData data){
+
+
+
         renderer = new TextRenderer(new Font("Serif", Font.PLAIN, 14), true, true);
         df = new DecimalFormat("#.##");
         labelList = new LinkedList<LabelList>();
@@ -668,7 +674,7 @@ public class GraphFrame implements GLEventListener{
         });*/
 
         GridBagHelper helper = new GridBagHelper();
-        JPanel settingsPlotPanel = new JPanel(new GridBagLayout());
+
         //helper.setWeights(0.33f, 0.06f).fillBoth();
         settingsPlotPanel.setBackground(Color.white);
         settingsPlotPanel.add(rangeXName, helper.get());

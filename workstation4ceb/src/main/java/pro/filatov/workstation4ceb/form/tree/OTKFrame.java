@@ -241,7 +241,7 @@ public class OTKFrame extends JFrame {
         splitMain0.setDividerSize(9);
         splitMain0.setSize(getWidth(), getHeight());
         splitMain0.setDividerLocation(0.6);
-        splitMain0.setResizeWeight(1);
+        splitMain0.setResizeWeight(0.5);
         splitMain0.setOneTouchExpandable(true);
         splitMain0.setTopComponent(otkPanel);//createPanel("TopPanelMain0")
         splitMain0.setBottomComponent(sysLogScrollPane);
