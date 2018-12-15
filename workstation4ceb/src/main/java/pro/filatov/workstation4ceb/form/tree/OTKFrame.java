@@ -47,7 +47,7 @@ public class OTKFrame extends JFrame {
     private boolean runPWM = false;
     private boolean runDAC = false;
 
-    ComboBoxModel <String>defaultComboBoxModel;
+    DefaultComboBoxModel defaultComboBoxModel;
     private UartModel uartModel;
     private MemoryModel memoryModel;
     private  int radius = 30;

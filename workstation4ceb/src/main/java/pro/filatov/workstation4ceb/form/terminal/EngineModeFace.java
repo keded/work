@@ -25,6 +25,13 @@ import java.util.Map;
  */
 public class EngineModeFace extends JPanel implements IModeFace {
 
+
+    private JPanel grahButtonPanel;
+    public JPanel getGrahButtonPanel() {
+        return grahButtonPanel;
+    }
+
+
     LeftRadioButton enableKPUtoSHIM, enableSTEP, enableConst;
     JTextField uqTextField, udTextField, constInitAngle, deathTextField, nPwmTextField, stepTextField;
     JTextField rel_go_textfield, rel_fhv_textfield, coefFHVLowRate;
@@ -61,6 +68,8 @@ public class EngineModeFace extends JPanel implements IModeFace {
 
 
     public EngineModeFace() {
+
+        grahButtonPanel = new JPanel();
 
         GridBagHelper helper = new GridBagHelper();
         setLayout(new GridBagLayout());
@@ -321,13 +330,17 @@ public class EngineModeFace extends JPanel implements IModeFace {
         calcUd = createNotEditableTextField();
        // speedTethaTextField = createNotEditableTextField();
 
-
+        grahButtonPanel.add(getTextFieldLabeled(sinGO = new GraphTextField("SIN GO:", new Color(255, 0, 0)), " Sin GO:"));
         add(getTextFieldLabeled(sinGO = new GraphTextField("SIN GO:", new Color(255, 0, 0)), " SIN GO:"), helper.nextRow().setGridWidth(1).get());
+        grahButtonPanel.add(getTextFieldLabeled(cosGO = new GraphTextField("COS GO:", new Color(64, 74, 255)), " Cos GO:"));
         add(getTextFieldLabeled(cosGO = new GraphTextField("COS GO:", new Color(64, 74, 255)), " COS GO:"), helper.rightColumn().rightColumn().setGridWidth(2).get());
 
+        grahButtonPanel.add(getTextFieldLabeled(sinTO = new GraphTextField("SIN TO:", new Color(18, 255, 16)), "Sin TO:"));
         add(getTextFieldLabeled(sinTO = new GraphTextField("SIN TO:", new Color(18, 255, 16)), "SIN TO:"), helper.nextRow().setGridWidth(2).get());
+        grahButtonPanel.add(getTextFieldLabeled(cosTO = new GraphTextField("COS TO:", new Color(255, 55, 209)), " Cos TO:"));
         add(getTextFieldLabeled(cosTO = new GraphTextField("COS TO:", new Color(255, 55, 209)), " COS TO:"), helper.rightColumn().rightColumn().setGridWidth(2).get());
 
+        grahButtonPanel.add(getTextFieldLabeled(fhvGO = new GraphTextField("TSY:", new Color(255, 137, 0)), "TSY:"));
         add(getTextFieldLabeled(fhvGO = new GraphTextField("FHV GO:", new Color(255, 137, 0)), "FHV GO:"), helper.nextRow().setGridWidth(2).get());
         add(AppFrameHelper.getTextFieldLabeled(fhvTO, "FHV TO:", 60, 40), helper.rightColumn().rightColumn().setGridWidth(2).get());
 

@@ -36,7 +36,7 @@ public class UartModel {
 
     private int baudRate = 461538
             ;
-    private String portName = "COM3";
+    private String portName = "COM1";
     private byte[] packetForSending;
     private byte[] packetReceived;
     private SerialPort serialPort;
@@ -83,6 +83,10 @@ public class UartModel {
         }
 
 
+    }
+
+    public String getPortName(){
+        return portName;
     }
 
     public int reOpenFTDIInt(){

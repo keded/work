@@ -6,6 +6,7 @@ package pro.filatov.workstation4ceb.form.terminal.graph;
 
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.awt.TextRenderer;
+import pro.filatov.workstation4ceb.form.terminal.EngineModeFace;
 import pro.filatov.workstation4ceb.form.terminal.GridBagHelper;
 import pro.filatov.workstation4ceb.model.Model;
 
@@ -20,7 +21,7 @@ import java.util.LinkedList;
 public class GraphPanel   implements GLEventListener{
 
 
-    public JPanel settingsPlotPanel = new JPanel(new GridBagLayout());
+    private JPanel settingsPlotPanel = new JPanel(new GridBagLayout());
     private PointData pointData;
     private double rangeY, textOffsetZero = 0.0d, yMax, yMin, delYRange, textOffset = 0.0d;
     private boolean flagLabelList = true;
@@ -709,6 +710,10 @@ public class GraphPanel   implements GLEventListener{
         graphPanel.setSize(1200, 750);
         graphPanel.setVisible(true);
         graphPanel.setLayout(new BorderLayout());
+
+        EngineModeFace engineModeFace = new EngineModeFace();
+//        engineModeFace.refreshDataOnFace();
+        graphPanel.add(engineModeFace.getGrahButtonPanel(), BorderLayout.NORTH);
         graphPanel.add(glcanvas, BorderLayout.CENTER);
         graphPanel.add(settingsPlotPanel, BorderLayout.SOUTH);
 
