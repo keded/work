@@ -29,13 +29,7 @@ import java.util.List;
  */
 public class UartModel {
 
-
-
-
-
-
-    private int baudRate = 461538
-            ;
+    private int baudRate = 461538;
     private String portName = "COM1";
     private byte[] packetForSending;
     private byte[] packetReceived;
@@ -67,6 +61,8 @@ public class UartModel {
     }
 
 
+
+
     public void reOpenFTDI(){
         try {
             if(serialPort != null) {
@@ -83,6 +79,19 @@ public class UartModel {
         }
 
 
+    }
+
+    public void closeFTDI()  {
+        try {
+            if(serialPort != null) {
+                if (serialPort.isOpened()) {
+                    serialPort.closePort();
+                }
+                serialPort = null;
+            }
+        } catch (SerialPortException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getPortName(){

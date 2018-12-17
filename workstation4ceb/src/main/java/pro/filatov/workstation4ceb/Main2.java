@@ -2,6 +2,8 @@ package pro.filatov.workstation4ceb;
 
 
 
+import pro.filatov.workstation4ceb.form.AppFrame;
+import pro.filatov.workstation4ceb.form.MainFrame;
 import pro.filatov.workstation4ceb.form.tree.OTKFrame;
 import pro.filatov.workstation4ceb.model.Model;
 
@@ -23,7 +25,7 @@ public class Main2 {
                 new Runnable() {
                     public void run() {
                         Model.init();
-                        OTKFrame frame = new OTKFrame();
+                       OTKFrame frame = new OTKFrame();
 
 
                     }

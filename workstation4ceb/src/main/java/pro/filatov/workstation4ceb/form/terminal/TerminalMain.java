@@ -20,6 +20,11 @@ public class TerminalMain extends JPanel {
     private JTabbedPane  tabbedPane;
     private TerminalModel terminalModel;
     private Map<Integer, CebExchangeMode> tabeIndexMap;
+    private ModeControlPanel controlPanel;
+
+    public ModeControlPanel getControlPanel(){
+        return controlPanel;
+    }
 
     public TerminalMain(){
 
@@ -74,7 +79,9 @@ public class TerminalMain extends JPanel {
         c.weightx = 1;
         c.weighty = 0.01;
 
-        add(new ModeControlPanel(), c);
+        controlPanel = new ModeControlPanel();
+
+        add(controlPanel, c);
 
 
 

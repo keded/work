@@ -17,12 +17,12 @@ public class Model {
 
 
 
- //   private static EditorModel editorModel = new EditorModel();
+    private static EditorModel editorModel = new EditorModel();
     private static UartModel uartModel;
-  //  private static TreeViewModel treeViewModel = new TreeViewModel();
- //   private static ParserModel parserModel = new ParserModel();
-   // public static MemoryModel memoryModel = new MemoryModel();
-   // public static ImitatorModel imitatorModel = new ImitatorModel();
+    private static TreeViewModel treeViewModel = new TreeViewModel();
+    private static ParserModel parserModel = new ParserModel();
+    public static MemoryModel memoryModel = new MemoryModel();
+    public static ImitatorModel imitatorModel = new ImitatorModel();
     public static TerminalModel terminalModel = new TerminalModel();
     public static ExchangeModel exchangeModel = new ExchangeModel();
     public static PointData pointData = new PointData(400);
@@ -31,7 +31,7 @@ public class Model {
 
 
     public static void init(){
-       // editorModel.addAppFrameEventListener(treeViewModel);
+        editorModel.addAppFrameEventListener(treeViewModel);
     }
 
     public static UartModel getUartModel() {
@@ -44,29 +44,30 @@ public class Model {
 
 
     public static TreeViewModel getTreeViewModel() {
-        return null;
-        //return treeViewModel;
+//        return null;
+        return treeViewModel;
     }
 
-    public static ParserModel getParserModel() {     return null;
-        //return parserModel;
+    public static ParserModel getParserModel() {
+//        return null;
+        return parserModel;
     }
 
 
 
     public static EditorModel getEditorModel() {
-        return null;
-        //return editorModel;
+//        return null;
+        return editorModel;
     }
 
     public static MemoryModel getMemoryModel() {
-           return null;
-        //return memoryModel;
+//           return null;
+        return memoryModel;
     }
 
     public static ImitatorModel getImitatorModel() {
-        return null;
-        //return imitatorModel;
+//        return null;
+        return imitatorModel;
     }
 
     public static ExchangeModel getExchangeModel() {

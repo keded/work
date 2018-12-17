@@ -1,13 +1,20 @@
 package pro.filatov.workstation4ceb.view;
 
 
+import pro.filatov.workstation4ceb.form.AppFrame;
 import pro.filatov.workstation4ceb.form.AppFrameHelper;
+import pro.filatov.workstation4ceb.form.MainFrame;
 import pro.filatov.workstation4ceb.form.editor.CustomOutputStream;
 import pro.filatov.workstation4ceb.form.editor.TextLineNumber;
+import pro.filatov.workstation4ceb.form.terminal.IModeFace;
+import pro.filatov.workstation4ceb.form.terminal.Terminal;
+import pro.filatov.workstation4ceb.form.terminal.TerminalMain;
 import pro.filatov.workstation4ceb.form.terminal.graph.GraphPanel;
 import pro.filatov.workstation4ceb.form.terminal.graph.GraphTextField;
 import pro.filatov.workstation4ceb.form.terminal.EngineModeFace;
 import pro.filatov.workstation4ceb.model.Model;
+import pro.filatov.workstation4ceb.model.fpga.Terminal.CebExchangeMode;
+import pro.filatov.workstation4ceb.model.uart.ExchangeModel;
 import pro.filatov.workstation4ceb.model.uart.MemoryModel;
 import pro.filatov.workstation4ceb.model.uart.PacketHelper;
 import pro.filatov.workstation4ceb.model.uart.UartModel;
@@ -23,9 +30,15 @@ import java.awt.event.*;
 import java.io.PrintStream;
 
 
-public class AppViewFrame extends JFrame {
+public class AppViewFrame  extends JFrame{
 
+    private ExchangeModel exchangeModel;
 
+    private JPanel panel;
+
+    private GraphPanel  graphPanel;
+
+    private JPanel grahButtonPanel;
     private GraphTextField sinGO, cosGO, sinTO, cosTO, tsy;
     private JPanel grahButtomPanel;
 
@@ -75,62 +88,30 @@ public class AppViewFrame extends JFrame {
 
     public AppViewFrame(){
 
-
-
+        exchangeModel = Model.getExchangeModel();
+//        exchangeModel.addCebModeEventListener(CebExchangeMode.ENGINE_MODE, this );
+        uartModel = Model.getUartModel();
+        memoryModel = Model.getMemoryModel();
 
         setMinimumSize(new Dimension(1000, 600));
         setLocationRelativeTo(null);
-        setTitle("Провыкрка ПП-032 в составе ГИ");
+        setTitle("Проверка ПП-032 в составе ГИ");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
+        panel = new JPanel();
+
         initMenuBar();
         initPanel();
+        initGraphbutton();
+        initTerminal();
 
-
-        JPanel panel = new JPanel();
-        //****************** SYSTEM LOG **********************
-        JTextArea textAreaErrors = new JTextArea();
-        JScrollPane sysLogScrollPane =  new JScrollPane(textAreaErrors, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        sysLogScrollPane.setRowHeaderView(new TextLineNumber(textAreaErrors));
-        PrintStream printStream = new PrintStream(new CustomOutputStream(textAreaErrors));
-        System.setOut(printStream);
-        System.setErr(printStream);
-
-        JSplitPane splitMain0 = new JSplitPane();
-        splitMain0.setOrientation(JSplitPane.VERTICAL_SPLIT);
-        splitMain0.setDividerSize(9);
-        splitMain0.setSize(getWidth(), getHeight());
-        splitMain0.setDividerLocation(0.6);
-        splitMain0.setResizeWeight(1);
-        splitMain0.setOneTouchExpandable(true);
-        splitMain0.setTopComponent(panel);//createPanel("TopPanelMain0")
-        splitMain0.setBottomComponent(sysLogScrollPane);
-
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-
-        buttomPanel.setMaximumSize(new Dimension(400, 600));
-        panel.add(buttomPanel);
-        panel.setSize(new Dimension(getWidth(),getHeight()));
-
-
-        grahButtomPanel = new JPanel();
-
-        GraphPanel  graphPanel = new GraphPanel(Model.pointData, 5000, 10);
-
-        panel.add(graphPanel.getGraphPanel());
-
-        add(splitMain0);
         pack();
         setVisible(true);
     }
 
-
     private void initMenuBar(){
-
-        uartModel = Model.getUartModel();
-        memoryModel = Model.getMemoryModel();
 
         portList = Model.getUartModel().getSerialPortList();
         if(portList.length != 0){
@@ -178,7 +159,8 @@ public class AppViewFrame extends JFrame {
 
 
 
-                        if ( com.getText() == uartModel.getPortName()) {
+
+                        if ( uartModel.getPortName().equals(com.getText() )) {
                             System.out.println("setSelected: "  + uartModel.getPortName());
                             com.setSelected(true);
                         }
@@ -241,9 +223,12 @@ public class AppViewFrame extends JFrame {
                 if(init){
                     error = uartModel.reOpenFTDIInt();
                     initButton.setText("Денициализация");
+                    initLed.on();
                 }else {
-                    initLed.refresh();
+
                     initButton.setText("Инициализация");
+                    uartModel.closeFTDI();
+                    initLed.off();
                 }
                 if(error == 0){
                     if(!init){
@@ -283,7 +268,7 @@ public class AppViewFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 obmen = !obmen;
                 if(obmen){
-                    workButton.setText("Вылючить обмен");
+                    workButton.setText("Выключить обмен");
                     workLed.on();
                     ObmenCEBRutine obmenCEBRutine = new ObmenCEBRutine();
                     obmenCEBRutine.start();
@@ -296,7 +281,7 @@ public class AppViewFrame extends JFrame {
             }
         });
 
-        rotateButton = new JButton("Вращение ГИ");
+        rotateButton = new JButton("Включить ШИМ");
         rotateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -364,6 +349,59 @@ public class AppViewFrame extends JFrame {
 
     }
 
+    private void initGraphbutton(){
+
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add(buttomPanel);
+
+        grahButtonPanel = new JPanel();
+        JPanel butPan = new JPanel();
+
+        butPan.add(getTextFieldLabeled(sinGO = new GraphTextField("SIN GO:", new Color(255, 0, 0)), " Sin GO:"));
+        butPan.add(getTextFieldLabeled(cosGO = new GraphTextField("COS GO:", new Color(64, 74, 255)), " Cos GO:"));
+        butPan.add(getTextFieldLabeled(sinTO = new GraphTextField("SIN TO:", new Color(18, 255, 16)), "Sin TO:"));
+        butPan.add(getTextFieldLabeled(cosTO = new GraphTextField("COS TO:", new Color(255, 55, 209)), " Cos TO:"));
+        butPan.add(getTextFieldLabeled(tsy = new GraphTextField("TSY:", new Color(255, 137, 0)), "TSY:"));
+
+        graphPanel = new GraphPanel(Model.pointData, 5000, 10);
+        grahButtonPanel.setLayout(new BoxLayout(grahButtonPanel, BoxLayout.Y_AXIS));
+
+        grahButtonPanel.add(butPan);
+        grahButtonPanel.add(graphPanel.getGraphPanel());
+
+        panel.add(grahButtonPanel);
+
+
+    }
+
+    private void initTerminal(){
+        //****************** SYSTEM LOG **********************
+        JTextArea textAreaErrors = new JTextArea();
+        JScrollPane sysLogScrollPane =  new JScrollPane(textAreaErrors, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        sysLogScrollPane.setRowHeaderView(new TextLineNumber(textAreaErrors));
+        PrintStream printStream = new PrintStream(new CustomOutputStream(textAreaErrors));
+        System.setOut(printStream);
+        System.setErr(printStream);
+
+        JSplitPane splitMain0 = new JSplitPane();
+        splitMain0.setOrientation(JSplitPane.VERTICAL_SPLIT);
+        splitMain0.setDividerSize(9);
+        splitMain0.setSize(getWidth(), getHeight());
+        splitMain0.setDividerLocation(0.6);
+        splitMain0.setResizeWeight(1);
+        splitMain0.setOneTouchExpandable(true);
+        splitMain0.setTopComponent(panel);//createPanel("TopPanelMain0")
+        splitMain0.setBottomComponent(sysLogScrollPane);
+
+
+
+        buttomPanel.setMaximumSize(new Dimension(400, 600));
+
+        panel.setSize(new Dimension(getWidth(),getHeight()));
+
+        add(splitMain0);
+    }
+
     private class EnableOTKModeRutine extends  Thread {
 
         @Override
@@ -405,6 +443,43 @@ public class AppViewFrame extends JFrame {
                     }
                     sleep(20);
                     byte[]response = Model.getUartModel().getResponse();
+                    if (response.length < 10) {
+                        System.out.println("Length response from CEB are SMALL ");
+                        obmen=!obmen;
+                        workButton.setText("Включить обмен");
+                        workLed.off();
+                        return;
+                    }
+//                    byte[] resp = PacketHelper.extractCebPacket(Model.getUartModel().getResponse());
+                    sinGO.setText(getSensor(response[3], response[4]));
+                    cosGO.setText(getSensor(response[5], response[6]));
+                    sinTO.setText(getSensor(response[7], response[8]));
+                    cosTO.setText(getSensor(response[9], response[10]));
+
+//                    System.out.println("sinGO" + getSensor(response[3], response[4]));
+//                    System.out.println("cosGO" + getSensor(response[5], response[6]));
+//                    System.out.println("sinTO" + getSensor(response[7], response[8]));
+//                    System.out.println("cosTO" + getSensor(response[9], response[10]));
+//                    System.out.println("tsy" + getSensor(response[11], response[12]));
+
+
+                    tsy.setText(getSensor(response[11], response[12]));
+
+                    synchronized (Model.pointData) {
+                        try {
+                            Model.pointData.wait();
+                            Model.pointData.addPointPackage();
+                            sinGO.addPoint(getSensorDouble(response[3], response[4]));
+                            cosGO.addPoint(getSensorDouble(response[5], response[6]));
+                            sinTO.addPoint(getSensorDouble(response[7], response[8]));
+                            cosTO.addPoint(getSensorDouble(response[9], response[10]));
+                            tsy.addPoint(getSensorDouble(response[11], response[12]));
+                        } catch (InterruptedException ex) {
+                            System.err.println("own:: Interrupted: " + ex.getMessage());
+                        }
+                    }
+
+
 
                 }
                 return;
@@ -574,7 +649,6 @@ public class AppViewFrame extends JFrame {
             setBackground(Color.red);
             // setBorder(new LineBorder(new Color(200, 16, 14), 1, true));
         }
-
         public void on(){
             setBackground(Color.green);
         }
@@ -586,10 +660,17 @@ public class AppViewFrame extends JFrame {
                 setBackground(Color.green);
             else setBackground(Color.red);
         }
-
     }
 
     private JPanel getTextFieldLabeled(JTextField textField, String label) {
         return AppFrameHelper.getTextFieldLabeled(textField, label, 100, 40);
+    }
+
+    private String getSensor(byte low_byte, byte high_byte) {
+        return PacketHelper.getSensor(low_byte, high_byte);
+    }
+
+    private Double getSensorDouble(byte low_byte, byte high_byte) {
+        return PacketHelper.getSensorDouble(low_byte, high_byte);
     }
 }

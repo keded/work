@@ -17,10 +17,6 @@ import java.util.Map;
  */
 public class ExchangeModel {
 
-
-
-
-
     Map<CebExchangeMode, IModeFace> cebModeEventListeners = new HashMap<>();
 
     TerminalModel terminalModel;

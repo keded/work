@@ -21,6 +21,8 @@ import java.util.LinkedList;
 public class GraphPanel   implements GLEventListener{
 
 
+    private EngineModeFace engineModeFace;
+
     private JPanel settingsPlotPanel = new JPanel(new GridBagLayout());
     private PointData pointData;
     private double rangeY, textOffsetZero = 0.0d, yMax, yMin, delYRange, textOffset = 0.0d;
@@ -45,6 +47,18 @@ public class GraphPanel   implements GLEventListener{
     public JPanel getGraphPanel() {
         return graphPanel;
     }
+
+    public void setPointValue(byte []resp){
+        engineModeFace.setPointValue(resp);
+    }
+    public void setPointValue(String []resp){
+        engineModeFace.setPointValue(resp);
+    }
+    public void addPoint(byte []resp){
+        engineModeFace.addPoint(resp);
+    }
+
+
 
     private JPanel graphPanel;
     public GraphPanel(PointData data, long rangeStart, int delXStart, double max, double min){
@@ -711,10 +725,11 @@ public class GraphPanel   implements GLEventListener{
         graphPanel.setVisible(true);
         graphPanel.setLayout(new BorderLayout());
 
-        EngineModeFace engineModeFace = new EngineModeFace();
+        engineModeFace = new EngineModeFace();
 //        engineModeFace.refreshDataOnFace();
-        graphPanel.add(engineModeFace.getGrahButtonPanel(), BorderLayout.NORTH);
+//        graphPanel.add(engineModeFace.getGrahButtonPanel(), BorderLayout.NORTH);
         graphPanel.add(glcanvas, BorderLayout.CENTER);
+
         graphPanel.add(settingsPlotPanel, BorderLayout.SOUTH);
 
         //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

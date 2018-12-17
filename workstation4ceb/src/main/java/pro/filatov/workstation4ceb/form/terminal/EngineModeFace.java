@@ -31,6 +31,35 @@ public class EngineModeFace extends JPanel implements IModeFace {
         return grahButtonPanel;
     }
 
+    public void setPointValue(byte[] resp){
+        sinGO.setText(getSensor(resp[2], resp[3]));
+        cosGO.setText(getSensor(resp[4], resp[5]));
+        sinTO.setText(getSensor(resp[6], resp[7]));
+        cosTO.setText(getSensor(resp[8], resp[9]));
+
+        fhvGO.setText(getSensor(resp[10], resp[11]));
+    }
+
+    public void setPointValue(String []text){
+
+        sinGO.setText(text[0]);
+        cosGO.setText(text[1]);
+        sinTO.setText(text[2]);
+        cosTO.setText(text[3]);
+
+        fhvGO.setText(text[4]);
+    }
+
+    public void addPoint(byte resp[]){
+
+        sinGO.addPoint(getSensorDouble(resp[2], resp[3]));
+        cosGO.addPoint(getSensorDouble(resp[4], resp[5]));
+        sinTO.addPoint(getSensorDouble(resp[6], resp[7]));
+        cosTO.addPoint(getSensorDouble(resp[8], resp[9]));
+        fhvGO.addPoint(getSensorDouble(resp[10], resp[11]));
+
+    }
+
 
     LeftRadioButton enableKPUtoSHIM, enableSTEP, enableConst;
     JTextField uqTextField, udTextField, constInitAngle, deathTextField, nPwmTextField, stepTextField;
@@ -65,6 +94,7 @@ public class EngineModeFace extends JPanel implements IModeFace {
 
     ExchangeModel exchangeModel;
     TerminalModel terminalModel;
+
 
 
     public EngineModeFace() {

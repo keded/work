@@ -1,9 +1,6 @@
 package pro.filatov.workstation4ceb.form.terminal;
 
-import pro.filatov.workstation4ceb.form.terminal.graph.GraphFrame;
-import pro.filatov.workstation4ceb.form.terminal.graph.IEnableGraphListener;
-import pro.filatov.workstation4ceb.form.terminal.graph.PlotFrame;
-import pro.filatov.workstation4ceb.form.terminal.graph.PlotFrame2;
+import pro.filatov.workstation4ceb.form.terminal.graph.*;
 import pro.filatov.workstation4ceb.model.Model;
 import pro.filatov.workstation4ceb.model.fpga.Terminal.TerminalModel;
 import pro.filatov.workstation4ceb.model.uart.ExchangeModel;
@@ -31,7 +28,13 @@ public class ModeControlPanel extends JPanel  implements TerminalModelEventListe
     PlotFrame2 plotDialog2;
     JButton initBlockButton;
     JButton   buttonReOpenFTDI;
-    GraphFrame graphFrame;
+    private GraphPanel graphPanel;
+    private GraphFrame graphFrame;
+
+    public GraphPanel getGraphPanel () {
+        graphPanel = new GraphPanel(Model.pointData, 5000, 10);
+        return graphPanel;
+    }
 
     public ModeControlPanel(){
 

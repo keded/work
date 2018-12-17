@@ -136,8 +136,6 @@ public class PacketHelper {
             System.arraycopy(data, 4, res, 0, size-6);
             System.arraycopy(data, 64, res, 58, 8);
         }
-
-
         return res;
     }
 

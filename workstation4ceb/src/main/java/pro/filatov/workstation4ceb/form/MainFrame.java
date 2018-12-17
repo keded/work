@@ -29,10 +29,16 @@ public class MainFrame extends JFrame implements IModelEditorEventListener {
 
 
     private JTextArea textAreaErrors;
+    private TerminalMain terminalMain;
 
     private StatusBar statusBar;
 
     private static MainFrame instance;
+
+    public TerminalMain getTerminalMain(){
+        return terminalMain;
+    }
+
 
     public static MainFrame getInstance() {
         if(MainFrame.instance == null) {
@@ -88,7 +94,8 @@ public class MainFrame extends JFrame implements IModelEditorEventListener {
         splitMain0.setDividerLocation(0.8);
         splitMain0.setResizeWeight(1);
         splitMain0.setOneTouchExpandable(true);
-        splitMain0.setTopComponent(new TerminalMain());//createPanel("TopPanelMain0")
+        terminalMain = new TerminalMain();
+        splitMain0.setTopComponent(terminalMain);//createPanel("TopPanelMain0")
         splitMain0.setBottomComponent(outPanel);
         add(splitMain0);
         Model.getEditorModel().setModelEditorEventListener(this);
