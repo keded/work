@@ -14,6 +14,7 @@ import pro.filatov.workstation4ceb.form.terminal.graph.GraphTextField;
 import pro.filatov.workstation4ceb.form.terminal.EngineModeFace;
 import pro.filatov.workstation4ceb.model.Model;
 import pro.filatov.workstation4ceb.model.fpga.Terminal.CebExchangeMode;
+import pro.filatov.workstation4ceb.model.fpga.Terminal.DataRamWord;
 import pro.filatov.workstation4ceb.model.uart.ExchangeModel;
 import pro.filatov.workstation4ceb.model.uart.MemoryModel;
 import pro.filatov.workstation4ceb.model.uart.PacketHelper;
@@ -21,16 +22,13 @@ import pro.filatov.workstation4ceb.model.uart.UartModel;
 
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.swing.*;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
+import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.PrintStream;
+import java.io.*;
 
 
-public class AppViewFrame  extends JFrame{
+public class AppViewFrame  extends JFrame implements IModeFace{
 
     private ExchangeModel exchangeModel;
 
@@ -84,7 +82,7 @@ public class AppViewFrame  extends JFrame{
     private JLabel rotateLabel = new JLabel("Скорость вращения");
     private JSlider rotateSlider = new JSlider(JSlider.HORIZONTAL, 0, 10, 0);
 
-
+    private String Patch = "C://Sarmat//";
 
     public AppViewFrame(){
 
@@ -126,7 +124,13 @@ public class AppViewFrame  extends JFrame{
 
         save = new JMenuItem("Сохранить", new ImageIcon("src/main/resources/icons/save.png"));
         save.setMnemonic(KeyEvent.VK_S);
-//        save.addActionListener(this);
+        save.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveFile();
+
+            }
+        });
         file.add(save);
 
         exit = new JMenuItem("Закрыть", new ImageIcon("src/main/resources/icons/exit.png"));
@@ -160,7 +164,7 @@ public class AppViewFrame  extends JFrame{
 
 
 
-                        if ( uartModel.getPortName().equals(com.getText() )) {
+                        if ( uartModel.getPortName().equals(com.getText())) {
                             System.out.println("setSelected: "  + uartModel.getPortName());
                             com.setSelected(true);
                         }
@@ -184,13 +188,8 @@ public class AppViewFrame  extends JFrame{
 
         menuBar.add(settings);
 
-
-
-
-
         about = new JMenu("Помощь");
         menuBar.add(about);
-
 
         setJMenuBar(menuBar);
     }
@@ -313,6 +312,18 @@ public class AppViewFrame  extends JFrame{
         rotatePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,rotatePanel.getMinimumSize().height));
         rotateSlider.setMaximumSize(new Dimension(Integer.MAX_VALUE,rotateSlider.getMinimumSize().height));
 
+        numGITextField.setText("");
+        numPPTextField.setText("");
+
+        rotateSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+
+                System.out.println("Step: " + rotateSlider.getValue());
+            }
+        });
+
+
 
         buttomPanel.setLayout(new BoxLayout(buttomPanel, BoxLayout.PAGE_AXIS));
 
@@ -402,6 +413,12 @@ public class AppViewFrame  extends JFrame{
         add(splitMain0);
     }
 
+
+    @Override
+    public void refreshDataOnFace() {
+
+    }
+
     private class EnableOTKModeRutine extends  Thread {
 
         @Override
@@ -430,7 +447,7 @@ public class AppViewFrame  extends JFrame{
         public void run() {
             try {
                 while(obmen){
-                    byte []request = createPacket();
+                    byte []request = createRequest();
                     byte[] cebPacket = PacketHelper.createCebPacket(request);
                     byte[] packetToBox = PacketHelper.createBoxPacketToCeb(cebPacket);
                     UartModel.EchangePacketAction t = Model.getUartModel().doExchangePacket(packetToBox);
@@ -456,19 +473,13 @@ public class AppViewFrame  extends JFrame{
                     sinTO.setText(getSensor(response[7], response[8]));
                     cosTO.setText(getSensor(response[9], response[10]));
 
-//                    System.out.println("sinGO" + getSensor(response[3], response[4]));
-//                    System.out.println("cosGO" + getSensor(response[5], response[6]));
-//                    System.out.println("sinTO" + getSensor(response[7], response[8]));
-//                    System.out.println("cosTO" + getSensor(response[9], response[10]));
-//                    System.out.println("tsy" + getSensor(response[11], response[12]));
-
-
                     tsy.setText(getSensor(response[11], response[12]));
 
                     synchronized (Model.pointData) {
                         try {
                             Model.pointData.wait();
                             Model.pointData.addPointPackage();
+
                             sinGO.addPoint(getSensorDouble(response[3], response[4]));
                             cosGO.addPoint(getSensorDouble(response[5], response[6]));
                             sinTO.addPoint(getSensorDouble(response[7], response[8]));
@@ -494,12 +505,10 @@ public class AppViewFrame  extends JFrame{
         }
     }
 
-    private byte[]createPacket(){
+        @Override
+        public byte[] createRequest() {
 
         byte []packet = new byte[] {} ;// {(byte)0xbb, (byte)0xbb};
-
-
-
 
         packet = PacketHelper.addDataToPacket(packet, PacketHelper.i2b(0x5000));
 
@@ -526,14 +535,13 @@ public class AppViewFrame  extends JFrame{
         packet = PacketHelper.addDataToPacket(packet, rotate ? (byte) 0x07 : (byte) 0x00);
         packet = PacketHelper.addDataToPacket(packet, (byte) 0x00);
 
-
         packet = PacketHelper.addDataToPacket(packet, Integer.parseInt("004"));
         packet = PacketHelper.addDataToPacket(packet, Integer.parseInt("004"));
 
         packet = PacketHelper.addDataToPacket(packet, (byte) 0x00);
         packet = PacketHelper.addDataToPacket(packet, (byte) 0x00);
 
-        packet = PacketHelper.addDataToPacket(packet, Integer.parseInt("0000")); // 1900
+        packet = PacketHelper.addDataToPacket(packet, Integer.parseInt("500")); // 1900
         packet = PacketHelper.addDataToPacket(packet, Integer.parseInt("0"));
 
         boolean[] argMatching = {false, false, false, true};
@@ -549,13 +557,15 @@ public class AppViewFrame  extends JFrame{
             modeKPUint = PacketHelper.bool2byte(modeKPU);
         } else {
             {
-                modeKPUint = (byte) 0x02;
+                modeKPUint = (byte) 0x00;
             }
         }
         packet = PacketHelper.addDataToPacket(packet, modeKPUint);
         packet = PacketHelper.addDataToPacket(packet, (byte) 0x00);
 
-        Integer step = Integer.parseInt("2");
+//        Integer step = Integer.parseInt("20");
+        Integer step = rotateSlider.getValue();
+        System.out.println("Step: " + step);
         packet = PacketHelper.addDataToPacket(packet, step);
 
         if (step < 0) {
@@ -569,7 +579,7 @@ public class AppViewFrame  extends JFrame{
         }
 
 
-        Integer porogFHVgoOrToInt = Integer.parseInt("0");
+        Integer porogFHVgoOrToInt = Integer.parseInt("127");
         packet = PacketHelper.addDataToPacket(packet, porogFHVgoOrToInt);
 
         Integer fhvTOdelitelInt = Integer.parseInt("0");
@@ -591,7 +601,7 @@ public class AppViewFrame  extends JFrame{
         packet = PacketHelper.addDataToPacket(packet, (byte) 0x00);
 
 
-        Integer rateAdcInt = Integer.parseInt("28");
+        Integer rateAdcInt = Integer.parseInt("18");
         if (false) {
             rateAdcInt = rateAdcInt | 0x4000;
         }
@@ -637,6 +647,8 @@ public class AppViewFrame  extends JFrame{
 
     }
 
+
+
     private class Panel extends JPanel{
         public Panel(){
             setLayout(new FlowLayout (FlowLayout.LEFT, 10, 10));
@@ -672,5 +684,83 @@ public class AppViewFrame  extends JFrame{
 
     private Double getSensorDouble(byte low_byte, byte high_byte) {
         return PacketHelper.getSensorDouble(low_byte, high_byte);
+    }
+
+    private void saveFile(){
+
+        if (numGITextField.getText().equals("")  ) {
+            if (numPPTextField.getText().equals("")) {
+                System.out.println("NO Save");
+                JOptionPane.showMessageDialog(AppViewFrame.this,
+                        "<html><h2>Внимание!</h2>Введите № ГИ и № ПП");
+            }else {
+                System.out.println("NO Save");
+                JOptionPane.showMessageDialog(AppViewFrame.this,
+                        "<html><h2>Внимание!</h2>Введите № ГИ");
+            }
+        } else {
+            if (numPPTextField.getText().equals("")) {
+                System.out.println("NO Save");
+                JOptionPane.showMessageDialog(AppViewFrame.this,
+                        "<html><h2>Внимание!</h2>Введите № ПП");
+            } else {
+
+                CreateFolder("C://Sarmat");
+                CreateFolder("C://Sarmat//" + numGITextField.getText());
+
+                String patch = "C://Sarmat//" + numGITextField.getText()+ "//" + numPPTextField.getText() + ".txt";
+
+                File dir = new File(patch);
+               /* if (dir.isFile()){
+                    System.out.println("File true!");
+                }*/
+               for(int i=1; i>0 ;i++){
+                   if (!dir.isFile()){
+                       break;
+                   }
+                   patch = "C://Sarmat//" + numGITextField.getText()+ "//" + numPPTextField.getText()+ "(" + i + ")" +".txt";
+                   dir = new File(patch);
+
+               }
+                String text = "Hello world!"; // строка для записи
+                try(FileOutputStream fos=new FileOutputStream(patch))
+                {
+                    // перевод строки в байты
+                    byte[] buffer = text.getBytes();
+
+                    fos.write(buffer, 0, buffer.length);
+                }
+                catch(IOException ex){
+
+                    System.out.println(ex.getMessage());
+                }
+                System.out.println("Save - OK");
+                JOptionPane.showMessageDialog(AppViewFrame.this,
+                        "<html><h2>Сохранено!</h2>" + patch);
+            }
+
+        }
+
+    }
+
+    private void CreateFolder (String Patch){
+        File theDir = new File(Patch);
+
+//               if the directory does not exist, create it
+        if (!theDir.exists()) {
+            System.out.println("creating directory: " + theDir.getName());
+            boolean result = false;
+
+            try{
+                theDir.mkdir();
+                result = true;
+            }
+            catch(SecurityException se){
+                //handle it
+            }
+            if(result) {
+                System.out.println("Folder created");
+            }
+        }
     }
 }

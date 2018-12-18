@@ -23,6 +23,9 @@ public class PointData {
     }
 
 
+    public int getBuffer(){
+        return buffer;
+    }
 
     public PointData(int buf) {
         this.buffer = buf;

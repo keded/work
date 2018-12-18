@@ -24,7 +24,7 @@ public class Main2 {
         SwingUtilities.invokeLater(
                 new Runnable() {
                     public void run() {
-                        Model.init();
+
                        OTKFrame frame = new OTKFrame();
 
 

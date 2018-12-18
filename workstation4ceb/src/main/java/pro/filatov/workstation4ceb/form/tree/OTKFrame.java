@@ -351,7 +351,7 @@ public class OTKFrame extends JFrame {
         packet = PacketHelper.addDataToPacket(packet, (byte) 0x00);
         packet = PacketHelper.addDataToPacket(packet, (byte) 0x00);
 
-        packet = PacketHelper.addDataToPacket(packet, Integer.parseInt("0000")); // 1900
+        packet = PacketHelper.addDataToPacket(packet, Integer.parseInt("500")); // 1900
         packet = PacketHelper.addDataToPacket(packet, Integer.parseInt("0"));
 
         boolean[] argMatching = {false, false, false, true};
@@ -373,7 +373,7 @@ public class OTKFrame extends JFrame {
         packet = PacketHelper.addDataToPacket(packet, modeKPUint);
         packet = PacketHelper.addDataToPacket(packet, (byte) 0x00);
 
-        Integer step = Integer.parseInt("2");
+        Integer step = Integer.parseInt("5");
         packet = PacketHelper.addDataToPacket(packet, step);
 
         if (step < 0) {
